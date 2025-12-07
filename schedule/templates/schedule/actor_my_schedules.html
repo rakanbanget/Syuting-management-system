@@ -1,0 +1,40 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Jadwal Saya{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Jadwal Saya</h1>
+
+{% if reminders %}
+  <div class="mb-4 p-4 bg-amber-100 text-amber-900 rounded">⚠️ Reminder: Besok ada jadwal yang harus Anda ikuti.</div>
+{% endif %}
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+  {% for app in my_applications %}
+  {% with s=app.schedule %}
+  <div class="bg-white rounded shadow hover:shadow-md border {% if app.status == 'confirmed' %}border-indigo-300{% elif app.status == 'rejected' %}border-red-300{% else %}border-slate-200{% endif %}">
+    <div class="p-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">{{ s.title }}</h3>
+        <span class="text-sm px-2 py-1 rounded {% if app.status == 'confirmed' %}bg-indigo-100 text-indigo-800{% elif app.status == 'rejected' %}bg-red-100 text-red-800{% else %}bg-slate-100 text-slate-800{% endif %}">{{ app.get_status_display }}</span>
+      </div>
+      <div class="mt-2 text-sm">📅 {{ s.date }} • ⏰ {{ s.time }}</div>
+      <div class="text-sm">📍 {{ s.location }}</div>
+      <details class="mt-2">
+        <summary class="text-sm text-slate-600 cursor-pointer">📜 Script/Naskah</summary>
+        <div class="mt-2 whitespace-pre-wrap text-sm">{{ s.script|default:'-' }}</div>
+      </details>
+      {% if app.status == 'pending' %}
+        <div class="mt-4">
+          <form method="post" action="{% url 'leave_schedule' s.id %}">
+            {% csrf_token %}
+            <button class="px-3 py-1 rounded bg-slate-200" type="submit">Batalkan Pengajuan</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endwith %}
+  {% empty %}
+    <p>Belum ada pengajuan jadwal.</p>
+  {% endfor %}
+</div>
+{% endblock %}

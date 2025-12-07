@@ -1,0 +1,29 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Semua Jadwal Tersedia{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Semua Jadwal Tersedia</h1>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for s in available_schedules %}
+  <div class="bg-white rounded shadow hover:shadow-md border border-slate-200">
+    <div class="p-4">
+      <h3 class="font-semibold">{{ s.title }}</h3>
+      <div class="mt-2 text-sm">📅 {{ s.date }} • ⏰ {{ s.time }}</div>
+      <div class="text-sm">📍 {{ s.location }}</div>
+      <details class="mt-2">
+        <summary class="text-sm text-slate-600 cursor-pointer">📜 Script/Naskah</summary>
+        <div class="mt-2 whitespace-pre-wrap text-sm">{{ s.script|default:'-' }}</div>
+      </details>
+      <div class="mt-4">
+        <form method="post" action="{% url 'join_schedule' s.id %}">
+          {% csrf_token %}
+          <button class="px-3 py-1 rounded text-white bg-charcoal font-bold hover:bg-charcoal-light transition" type="submit">Ajukan Gabung</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <p>Tidak ada jadwal tersedia.</p>
+  {% endfor %}
+</div>
+{% endblock %}

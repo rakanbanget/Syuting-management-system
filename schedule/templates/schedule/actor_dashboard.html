@@ -1,0 +1,58 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Dashboard Aktor{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Dashboard Aktor</h1>
+
+{% if reminders %}
+  <div class="mb-4 p-4 bg-amber-100 text-amber-900 rounded">⚠️ Reminder: Besok ada jadwal yang harus Anda ikuti.</div>
+{% endif %}
+
+<h2 class="text-lg font-semibold mb-2">Jadwal Saya</h2>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+  {% for s in my_schedules %}
+  <div class="bg-white rounded shadow hover:shadow-md border {% if s.status == 'completed' %}border-green-400{% elif s.status == 'confirmed' %}border-indigo-300{% else %}border-slate-200{% endif %}">
+    <div class="p-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">{{ s.title }}</h3>
+        <span class="text-sm px-2 py-1 rounded {% if s.status == 'completed' %}bg-green-100 text-green-800{% elif s.status == 'confirmed' %}bg-indigo-100 text-indigo-800{% else %}bg-slate-100 text-slate-800{% endif %}">{{ s.get_status_display }}</span>
+      </div>
+      <div class="mt-2 text-sm">📅 {{ s.date }} • ⏰ {{ s.time }}</div>
+      <div class="text-sm">📍 {{ s.location }}</div>
+      <details class="mt-2">
+        <summary class="text-sm text-slate-600 cursor-pointer">📜 Script/Naskah</summary>
+        <div class="mt-2 whitespace-pre-wrap text-sm">{{ s.script|default:'-' }}</div>
+      </details>
+      {% if s.status != 'completed' %}
+        <div class="mt-4">
+          <a class="px-3 py-1 rounded bg-slate-200" href="{% url 'leave_schedule' s.id %}">Batal Ikut</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+    <p>Belum ada jadwal yang diikuti.</p>
+  {% endfor %}
+</div>
+
+<h2 class="text-lg font-semibold mb-2">Semua Jadwal Tersedia</h2>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for s in available_schedules %}
+  <div class="bg-white rounded shadow hover:shadow-md border border-slate-200">
+    <div class="p-4">
+      <h3 class="font-semibold">{{ s.title }}</h3>
+      <div class="mt-2 text-sm">📅 {{ s.date }} • ⏰ {{ s.time }}</div>
+      <div class="text-sm">📍 {{ s.location }}</div>
+      <details class="mt-2">
+        <summary class="text-sm text-slate-600 cursor-pointer">📜 Script/Naskah</summary>
+        <div class="mt-2 whitespace-pre-wrap text-sm">{{ s.script|default:'-' }}</div>
+      </details>
+      <div class="mt-4">
+        <a class="px-3 py-1 rounded text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90" href="{% url 'join_schedule' s.id %}">Saya Tersedia</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <p>Tidak ada jadwal tersedia.</p>
+  {% endfor %}
+</div>
+{% endblock %}

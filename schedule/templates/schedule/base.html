@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Shooting Schedule{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'charcoal': '#2d2d2d',
+            'charcoal-light': '#3d3d3d',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <nav class="bg-black text-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full border-4 border-white bg-white flex items-center justify-center">
+          <div class="text-black font-black text-xl">C</div>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-black text-lg leading-tight">After</span>
+          <span class="font-black text-lg leading-tight -mt-1">
+            <span class="text-charcoal">L</span>ass
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        {% if request.user.is_authenticated %}
+          {% if request.user.role == 'producer' %}
+            <a class="hover:underline font-semibold" href="{% url 'producer_dashboard' %}">Dashboard Produser</a>
+            <a class="hover:underline font-semibold" href="{% url 'create_schedule' %}">Buat Jadwal</a>
+          {% elif request.user.role == 'editor' %}
+            <a class="hover:underline font-semibold" href="{% url 'editor_dashboard' %}">Dashboard Editor</a>
+          {% elif request.user.role == 'actor' %}
+            <a class="hover:underline font-semibold" href="{% url 'actor_my_schedules' %}">Jadwal Saya</a>
+            <a class="hover:underline font-semibold" href="{% url 'actor_available_schedules' %}">Semua Jadwal</a>
+          {% endif %}
+          <span class="ml-2">|</span>
+          <span class="ml-1">👤 {{ request.user.get_full_name|default:request.user.username }}</span>
+          <a href="{% url 'logout' %}" class="px-3 py-1.5 rounded bg-white text-black font-bold hover:bg-slate-200 transition">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto p-4">
+    {% if messages %}
+      <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50">
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <div class="toast transition-all duration-300 bg-green-100 text-green-800 px-4 py-2 rounded shadow" data-duration="500">✅ {{ message }}</div>
+          {% elif message.tags == 'error' %}
+            <div class="toast transition-all duration-300 bg-red-100 text-red-800 px-4 py-2 rounded shadow" data-duration="5000">❌ {{ message }}</div>
+          {% elif message.tags == 'info' %}
+            <div class="toast transition-all duration-300 bg-blue-100 text-blue-800 px-4 py-2 rounded shadow" data-duration="2000">ℹ️ {{ message }}</div>
+          {% else %}
+            <div class="toast transition-all duration-300 bg-slate-100 text-slate-800 px-4 py-2 rounded shadow" data-duration="2000">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <script>
+        (function(){
+          const toasts = document.querySelectorAll('#toast-container .toast');
+          toasts.forEach(function(t){
+            const d = parseInt(t.getAttribute('data-duration') || '2000', 10);
+            setTimeout(function(){
+              try {
+                t.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(function(){
+                  if (t && t.parentNode) { t.parentNode.removeChild(t); }
+                  const container = document.getElementById('toast-container');
+                  if (container && container.children.length === 0) { container.remove(); }
+                }, 300);
+              } catch(e) {}
+            }, d);
+          });
+        })();
+      </script>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

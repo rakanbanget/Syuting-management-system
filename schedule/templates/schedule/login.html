@@ -1,0 +1,23 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Login - Shooting Schedule{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto mt-8 bg-white p-6 rounded shadow">
+  <h1 class="text-xl font-semibold mb-4">Login</h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      <label class="block mb-1">Username *</label>
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+    <div>
+      <label class="block mb-1">Password *</label>
+      {{ form.password }}
+      {{ form.password.errors }}
+    </div>
+    <button class="w-full py-2 rounded text-white bg-charcoal font-bold hover:bg-charcoal-light transition">Login</button>
+  </form>
+  <p class="text-sm mt-4">Belum punya akun? <a class="text-charcoal font-semibold" href="{% url 'register' %}">Register</a></p>
+</div>
+{% endblock %}

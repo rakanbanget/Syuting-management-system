@@ -1,0 +1,81 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Dashboard Produser{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">Dashboard Produser</h1>
+  <a href="{% url 'create_schedule' %}" class="px-4 py-2 rounded text-white bg-charcoal font-bold hover:bg-charcoal-light transition">+ Buat Jadwal</a>
+</div>
+
+{% if reminders %}
+  <div class="mb-4 p-4 bg-amber-100 text-amber-900 rounded">⚠️ Reminder: Ada jadwal besok yang sudah terkonfirmasi.</div>
+{% endif %}
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for s in schedules %}
+  <div class="bg-white rounded shadow hover:shadow-md border {% if s.status == 'completed' %}border-green-400{% elif s.status == 'closed' %}border-slate-300{% else %}border-slate-200{% endif %}">
+    <div class="p-4">
+      <div class="flex items-center justify-between">
+        <h2 class="font-semibold">{{ s.title }}</h2>
+        <span class="text-sm px-2 py-1 rounded {% if s.status == 'completed' %}bg-green-100 text-green-800{% elif s.status == 'closed' %}bg-slate-100 text-slate-800{% else %}bg-slate-100 text-slate-800{% endif %}">
+          {{ s.get_status_display }}
+        </span>
+      </div>
+      <div class="mt-2 text-sm">📅 {{ s.date }} • ⏰ {{ s.time }}</div>
+      <div class="text-sm">📍 {{ s.location }}</div>
+      {% if s.description %}<p class="mt-2 text-sm">{{ s.description }}</p>{% endif %}
+      <details class="mt-2">
+        <summary class="text-sm text-slate-600 cursor-pointer">📜 Script/Naskah</summary>
+        <div class="mt-2 whitespace-pre-wrap text-sm">{{ s.script|default:'-' }}</div>
+      </details>
+      <div class="mt-2 text-sm">👥 Aktor (Terkonfirmasi): {{ s.get_actors_list|default:'Belum ada' }}</div>
+
+      <div class="mt-4 space-y-2">
+        <div class="text-sm font-semibold">Pengajuan Menunggu:</div>
+        {% with pending_list=s.applications.all %}
+          {% if pending_list %}
+            {% for app in pending_list %}
+              {% if app.status == 'pending' %}
+              <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded border">
+                <div>
+                  <div class="font-medium">{{ app.actor.get_full_name|default:app.actor.username }}</div>
+                  <div class="text-xs text-slate-500">Diajukan: {{ app.submitted_at|date:"Y-m-d H:i" }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <form method="post" action="{% url 'approve_application' app.id %}">
+                    {% csrf_token %}
+                    <button class="px-2 py-1 rounded bg-green-600 text-white text-sm" type="submit">Terima</button>
+                  </form>
+                  <form method="post" action="{% url 'reject_application' app.id %}">
+                    {% csrf_token %}
+                    <button class="px-2 py-1 rounded bg-red-600 text-white text-sm" type="submit">Tolak</button>
+                  </form>
+                </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <div class="text-sm text-slate-500">Tidak ada pengajuan.</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="mt-4 flex gap-2">
+        <a class="px-3 py-1 rounded bg-slate-200" href="{% url 'edit_schedule' s.id %}">Edit</a>
+        <a class="px-3 py-1 rounded bg-red-100 text-red-800" href="{% url 'delete_schedule' s.id %}">Hapus</a>
+        {% if s.status != 'completed' %}
+          <a class="px-3 py-1 rounded bg-green-600 text-white" href="{% url 'complete_schedule' s.id %}">Tandai Selesai</a>
+        {% endif %}
+        {% if s.status == 'available' %}
+          <form method="post" action="{% url 'close_schedule' s.id %}">
+            {% csrf_token %}
+            <button class="px-3 py-1 rounded bg-slate-300" type="submit">Tutup Pendaftaran</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+    <p>Tidak ada jadwal.</p>
+  {% endfor %}
+</div>
+{% endblock %}

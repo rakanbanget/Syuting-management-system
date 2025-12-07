@@ -1,0 +1,47 @@
+{% extends 'schedule/base.html' %}
+{% block title %}Edit Jadwal{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-4">Edit Jadwal</h1>
+<form method="post" class="bg-white p-6 rounded shadow max-w-xl">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="grid grid-cols-1 gap-4">
+    <div>
+      <label class="block mb-1">Judul/Scene *</label>
+      {{ form.title }}
+      {{ form.title.errors }}
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block mb-1">Tanggal *</label>
+        {{ form.date }}
+        {{ form.date.errors }}
+      </div>
+      <div>
+        <label class="block mb-1">Waktu *</label>
+        {{ form.time }}
+        {{ form.time.errors }}
+      </div>
+    </div>
+    <div>
+      <label class="block mb-1">Lokasi *</label>
+      {{ form.location }}
+      {{ form.location.errors }}
+    </div>
+    <div>
+      <label class="block mb-1">Deskripsi</label>
+      {{ form.description }}
+      {{ form.description.errors }}
+    </div>
+    <div>
+      <label class="block mb-1">Script/Naskah</label>
+      {{ form.script }}
+      {{ form.script.errors }}
+    </div>
+  </div>
+  <div class="mt-4 flex gap-2">
+    <button class="px-4 py-2 rounded text-white bg-charcoal font-bold hover:bg-charcoal-light transition">Simpan</button>
+    <a href="{% url 'producer_dashboard' %}" class="px-4 py-2 rounded bg-slate-200">Batal</a>
+  </div>
+</form>
+{% endblock %}
